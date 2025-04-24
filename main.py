@@ -2,10 +2,18 @@ import uvicorn
 import json
 from fastapi import FastAPI
 from utils.database import execute_query_json
-from controllers.PokeRequestController import insert_pokemon_request, update_pokemon_request, select_pokemon_request
+from controllers.PokeRequestController import insert_pokemon_request, update_pokemon_request, select_pokemon_request, get_all_request
 from models.PokeRequest import PokeRequest
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permitir todos los orígenes
+    allow_credentials=True,
+    allow_methods=["*"],  # Permitir todos los métodos
+    allow_headers=["*"],  # Permitir todos los encabezados
+)
 
 @app.get("/")
 async def root():
@@ -17,7 +25,7 @@ async def root():
 
 @app.get("/version")
 async def version():
-    return {"version": "0.2.0"}
+    return {"version": "0.3.0"}
 
 #Endpoint para agregar nuevas peticiones
 @app.post("/api/request")
@@ -33,6 +41,14 @@ async def create_request(pokemon_request: PokeRequest):
 async def select_request(id: int):
     try:
         result = await select_pokemon_request(id)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/api/request")
+async def select_all_request():
+    try:
+        result = await get_all_request()
         return result
     except Exception as e:
         return {"error": str(e)}
