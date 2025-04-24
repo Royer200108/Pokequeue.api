@@ -2,7 +2,7 @@ import uvicorn
 import json
 from fastapi import FastAPI
 from utils.database import execute_query_json
-from controllers.PokeRequestController import insert_pokemon_request, update_pokemon_request, select_pokemon_request, get_all_request
+from controllers.PokeRequestController import insert_pokemon_request, update_pokemon_request, select_pokemon_request, get_all_request, delete_pokemon_request
 from models.PokeRequest import PokeRequest
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -45,6 +45,7 @@ async def select_request(id: int):
     except Exception as e:
         return {"error": str(e)}
 
+#Endpoint para obtener todos los reportes
 @app.get("/api/request")
 async def select_all_request():
     try:
@@ -62,6 +63,14 @@ async def update_request(pokemon_request: PokeRequest):
     except Exception as e:
         return {"error": str(e)}
 
+#Endpoint para eliminar reportes
+@app.delete("/api/delete/request/{id}")
+async def drop_pokemon_request(id: int):
+    try:
+        result = await delete_pokemon_request(id)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -55,24 +55,73 @@ async def insert_pokemon_request( pokemon_request: PokeRequest ) -> dict: #Esto 
             raise HTTPException(status_code=500, detail="Error interno en el servidor")
     
 async def get_all_request() -> dict:
-    query = """
-        select 
-            r.id as ReportId,
-            s.description as Status,
-            r.type as PokemonType,
-            r.url,
-            r.created,
-            r.updated
-        from pokequeue.requests r
-        inner join pokequeue.statuses s on r.id_status = s.id
-    """
-    result = await execute_query_json(query)
-    result_dict = json.loads(result) #Se convierte el resultado a un diccionario
-    print(result_dict)
-    blob = ABlob()
-    for record in result_dict:
-        id = record["ReportId"]
-        print(blob.generate_sas(id))
-        #Se modifica el valor de la columa url concatenandole el signature access token
-        record['url'] = f"{record['url']}?{blob.generate_sas(id)}" 
-    return result_dict
+    try:
+        query = """
+            select 
+                r.id as ReportId,
+                s.description as Status,
+                r.type as PokemonType,
+                r.url,
+                r.created,
+                r.updated
+            from pokequeue.requests r
+            inner join pokequeue.statuses s on r.id_status = s.id
+        """
+        result = await execute_query_json(query)
+        result_dict = json.loads(result) #Se convierte el resultado a un diccionario
+        print(result_dict)
+        blob = ABlob()
+        for record in result_dict:
+            id = record["ReportId"]
+            print(blob.generate_sas(id))
+            #Se modifica el valor de la columa url concatenandole el signature access token
+            record['url'] = f"{record['url']}?{blob.generate_sas(id)}" 
+        return result_dict
+    except Exception as e:
+        logger.error(f"Error al obtener todas las peticiones: {e}")
+        raise HTTPException(status_code=500, detail="Error interno en el servidor")
+"""
+async def delete_pokemon_request(id: int) -> dict:
+    try:
+        params = (id,)
+        
+        query1 = "select id from Pokequeue.requests where id = ?"
+        
+        result1 = await execute_query_json(query1, params)
+        result1_dict = json.loads(result1) #Se convierte el resultado a un diccionario
+        if not result1_dict:
+            raise HTTPException(status_code=404, detail="No se encontró la petición con el ID proporcionado")
+        else:
+            blob = ABlob()
+            blob.delete_blob(id) #Se elimina el blob de azure
+
+            query2 = "EXEC Pokequeue.delete_pokerequest ?"
+            
+            result2 = await execute_query_json(query2, params, needs_commit=True)
+            result_dict2 = json.loads(result2)  # Se convierte el resultado a un diccionario
+            return result_dict2  # Se retorna el resultado
+    except Exception as e:
+        logger.error(f"Error al eliminar la peticion: {e}")
+        raise HTTPException(status_code=500, detail="Error interno en el servidor")
+"""
+
+async def delete_pokemon_request(id: int) -> dict:
+    try:
+        params = (id,)
+        
+        query = "exec Pokequeue.delete_pokerequest ?"
+        
+        result = await execute_query_json(query, params, needs_commit=True)
+        result_dict = json.loads(result) #Se convierte el resultado a un diccionario
+        print(result_dict)
+        
+        if not result_dict:
+            raise HTTPException(status_code=404, detail="No se encontró la petición con el ID proporcionado")
+        else:
+            blob = ABlob()
+            blob.delete_blob(id) #Se elimina el blob de azure
+            return result_dict
+            
+    except Exception as e:
+        logger.error(f"Error al eliminar la peticion: {e}")
+        raise HTTPException(status_code=500, detail="Error interno en el servidor")
