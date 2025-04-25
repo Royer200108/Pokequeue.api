@@ -29,7 +29,7 @@ async def update_pokemon_request( pokemon_request: PokeRequest ) -> dict: #Esto 
         query = " exec Pokequeue.update_pokerequest ?, ?, ?" #Al ejecutarse el este query, el ? se reemplaza por el valor de params
         
         if not pokemon_request.url:
-             pokemon_request.url = ""
+            pokemon_request.url = ""
         
         params = (pokemon_request.id, pokemon_request.status, pokemon_request.url )       #Estos son los parametros enviados al query (En este caso solo el tipo de pokemon)
         result = await execute_query_json(query, params, needs_commit=True) #Se ejecuta el query y al ser un procedimiento almacenado, se indica que debe haber un commit despues de ejecutarlo
@@ -41,13 +41,14 @@ async def update_pokemon_request( pokemon_request: PokeRequest ) -> dict: #Esto 
             raise HTTPException(status_code=500, detail="Error interno en el servidor")
 
 async def insert_pokemon_request( pokemon_request: PokeRequest ) -> dict: #Esto retorna un diccionario
+    #No necesia mas validacion (Ya se hace con el parametro ge en el model)
     try:
-        query = " exec Pokequeue.create_pokerequest ? " #Al ejecutarse el este query, el ? se reemplaza por el valor de params
-        params = (pokemon_request.pokemon_type, )       #Estos son los parametros enviados al query (En este caso solo el tipo de pokemon)
+        query = " exec Pokequeue.create_pokerequest ?, ?" #Al ejecutarse el este query, el ? se reemplaza por el valor de params
+        params = (pokemon_request.pokemon_type, pokemon_request.sample_size)       #Estos son los parametros enviados al query (En este caso solo el tipo de pokemon)
         result = await execute_query_json(query, params, needs_commit=True) #Se ejecuta el query y al ser un procedimiento almacenado, se indica que debe haber un commit despues de ejecutarlo
         result_dict = json.loads(result) #Se convierte el resultado a un diccionario
-
-        await AQueue().insert_message_on_queue(result)
+        print(result_dict)
+        await AQueue().insert_message_on_queue(result) #Se inserta el mensaje en la cola de azure
 
         return result_dict #Se retorna el resultado
     except Exception as e:
