@@ -11,6 +11,7 @@ from utils.ABlob import ABlob
 logging.basicConfig(level=logging.INFO) #genera logs a nivel de info
 logger = logging.getLogger(__name__) #logger para la clase
 
+#Funcion para obtener una peticion especifica
 async def select_pokemon_request(id: int ): 
     try:
         query = " SELECT * FROM Pokequeue.requests WHERE id = ?" 
@@ -24,6 +25,7 @@ async def select_pokemon_request(id: int ):
             logger.error(f"Error al realizar la peticion: {e}")
             raise HTTPException(status_code=500, detail="Error interno en el servidor al traer la peticion")
 
+#Funcion para actualizar el estado de una peticion
 async def update_pokemon_request( pokemon_request: PokeRequest ) -> dict: #Esto retorna un diccionario
     try:
         query = " exec Pokequeue.update_pokerequest ?, ?, ?" #Al ejecutarse el este query, el ? se reemplaza por el valor de params
@@ -40,6 +42,7 @@ async def update_pokemon_request( pokemon_request: PokeRequest ) -> dict: #Esto 
             logger.error(f"Error al actualizar la peticion: {e}")
             raise HTTPException(status_code=500, detail="Error interno en el servidor")
 
+#Funcion para insertar una peticion
 async def insert_pokemon_request( pokemon_request: PokeRequest ) -> dict: #Esto retorna un diccionario
     #No necesia mas validacion (Ya se hace con el parametro ge en el model)
     try:
@@ -54,7 +57,8 @@ async def insert_pokemon_request( pokemon_request: PokeRequest ) -> dict: #Esto 
     except Exception as e:
             logger.error(f"Error al insertar la peticion: {e}")
             raise HTTPException(status_code=500, detail="Error interno en el servidor")
-    
+
+#Funcio para obtener todas las peticiones
 async def get_all_request() -> dict:
     try:
         query = """
@@ -81,31 +85,9 @@ async def get_all_request() -> dict:
     except Exception as e:
         logger.error(f"Error al obtener todas las peticiones: {e}")
         raise HTTPException(status_code=500, detail="Error interno en el servidor")
-"""
-async def delete_pokemon_request(id: int) -> dict:
-    try:
-        params = (id,)
-        
-        query1 = "select id from Pokequeue.requests where id = ?"
-        
-        result1 = await execute_query_json(query1, params)
-        result1_dict = json.loads(result1) #Se convierte el resultado a un diccionario
-        if not result1_dict:
-            raise HTTPException(status_code=404, detail="No se encontró la petición con el ID proporcionado")
-        else:
-            blob = ABlob()
-            blob.delete_blob(id) #Se elimina el blob de azure
 
-            query2 = "EXEC Pokequeue.delete_pokerequest ?"
-            
-            result2 = await execute_query_json(query2, params, needs_commit=True)
-            result_dict2 = json.loads(result2)  # Se convierte el resultado a un diccionario
-            return result_dict2  # Se retorna el resultado
-    except Exception as e:
-        logger.error(f"Error al eliminar la peticion: {e}")
-        raise HTTPException(status_code=500, detail="Error interno en el servidor")
-"""
 
+#Funcion para eliminar una peticion y su blob
 async def delete_pokemon_request(id: int) -> dict:
     try:
         params = (id,)

@@ -22,10 +22,10 @@ async def root():
     result_dict = json.loads(result)
     return result_dict
 
-
+#Endpoint para obtener la version de la API
 @app.get("/version")
 async def version():
-    return {"version": "0.3.0"}
+    return {"version": "0.5.0"}
 
 #Endpoint para agregar nuevas peticiones
 @app.post("/api/request")
@@ -36,7 +36,7 @@ async def create_request(pokemon_request: PokeRequest):
     except Exception as e:
         return {"error": str(e)}
 
-#Endpoint para obtener peticiones por id
+#Endpoint para obtener una peticion por id
 @app.get("/api/request/{id}")
 async def select_request(id: int):
     try:
@@ -45,7 +45,7 @@ async def select_request(id: int):
     except Exception as e:
         return {"error": str(e)}
 
-#Endpoint para obtener todos los reportes
+#Endpoint para obtener todos las peticions hechas
 @app.get("/api/request")
 async def select_all_request():
     try:
@@ -54,7 +54,7 @@ async def select_all_request():
     except Exception as e:
         return {"error": str(e)}
 
-#Endopint para actualizar el estado de las peticiones
+#Endopint para actualizar el estado de una peticion
 @app.put("/api/request")
 async def update_request(pokemon_request: PokeRequest):
     try:
@@ -63,7 +63,7 @@ async def update_request(pokemon_request: PokeRequest):
     except Exception as e:
         return {"error": str(e)}
 
-#Endpoint para eliminar reportes
+#Endpoint para eliminar una peticion por su id
 @app.delete("/api/delete/request/{id}")
 async def drop_pokemon_request(id: int):
     try:
