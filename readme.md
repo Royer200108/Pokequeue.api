@@ -73,11 +73,11 @@ ___Observación___ Para poder realizar este proceso es necesario contar previame
 3. Agregar las etiquetas a la nueva imagen que se subirá:
 
     ```bash
-        docker tag pokeapi:latest nombre_container_registry.azurecr.io/pokeapi:latest
+    docker tag pokeapi:latest nombre_container_registry.azurecr.io/pokeapi:latest
 
 
-        // Este comando cambiará con cada nueva release que se haga (comenzará siendo la 0.0.0)
-        docker tag pokeapi:latest nombre_container_registry.azurecr.io/pokeapi:0.0.0
+            // Este comando cambiará con cada nueva release que se haga (comenzará siendo la 0.0.0)
+            docker tag pokeapi:latest nombre_container_registry.azurecr.io/pokeapi:0.0.0
     ```
 
 4. Subir (hacer push) de la imagen previamente etiquetada al azure container registry:
