@@ -101,8 +101,10 @@ async def delete_pokemon_request(id: int) -> dict:
         if not result_dict:
             raise HTTPException(status_code=404, detail="No se encontró la petición con el ID proporcionado")
         else:
+            #Instancia un objeto blob
             blob = ABlob()
-            blob.delete_blob(id) #Se elimina el blob de azure
+            #Se elimina el blob de azure por medio del metodo delete_blob
+            blob.delete_blob(id)
             return result_dict
             
     except Exception as e:

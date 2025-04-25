@@ -7,6 +7,7 @@ class PokeRequest(BaseModel):
     pokemon_type: Optional[str] = Field(default=None, description="Tipo de Pokemon", pattern="^[a-zA-Z0-9_]+$")
     url: Optional[str] = Field(default=None, description="URL de la peticion", pattern="^https?://[a-zA-Z0-9._-]+(:[0-9]+)?(/.*)?$")
     status: Optional[str] = Field(default=None, description="Estado de la peticion", pattern="^(sent|completed|inprogress|failed)$")
+    #Agregando el campo requerido para obtener n pokemons de un tipo
     sample_size: Optional[int] = Field(default=None, ge=0, description="Tamaño de la muestra")
 
     '''name: str = Field(title="Nombre del Pokemon", description="Nombre del Pokemon")
