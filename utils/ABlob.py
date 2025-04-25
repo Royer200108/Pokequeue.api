@@ -29,17 +29,7 @@ class ABlob:
         return sas_token
     
     def delete_blob(self, id: int):
-        """
-        Delete a blob from Azure Storage container.
-        
-        Args:
-            id: The ID used to generate the blob name (poke_report_{id}.csv)
-            
-        Returns:
-            bool: True if deletion was successful, False if blob wasn't found
-        Raises:
-            Exception: For other Azure-related errors
-        """
+        #Forma el nombre del blob
         blob_name = f"poke_report_{id}.csv"
         try:
             #Crear el cliente del blob
@@ -47,13 +37,16 @@ class ABlob:
                 container=AZURE_STORAGE_CONTAINER,
                 blob=blob_name
             )
+            #Eliminate el blob
             blob_client.delete_blob()
+            #Retorna True si se elimino el blob
             return True
         except Exception as e:
-            # Specifically handle blob not found error
+            # Especifica una repsuesta para el error de NotFound
             if "BlobNotFound" in str(e):
-                print(f"Blob {blob_name} not found for deletion.")
+                print(f"Blob {blob_name} nno encontrado para eliminar.")
+                #Retorna False si no se encontro el blob
                 return False
             # Re-raise other exceptions
-            print(f"Error deleting blob {blob_name}: {str(e)}")
+            print(f"Error eliminando el blob {blob_name}: {str(e)}")
             raise
