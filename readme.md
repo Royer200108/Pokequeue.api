@@ -56,6 +56,14 @@ ___Observación___ Para poder realizar este proceso es necesario contar previame
     docker run -d -p 8000:8000 --name pokeapi-container --env-file .env pokeapi:latest
     ```
 
+___Observación.___ En caso de haber hecho un build de la imagen nuevamente (luego de hacer cambios en el código fuente de la aplicación) se debe eliminar el contenedor creado previamente para poder crear un nuevo contenedor
+
+```bash
+    docker stop pokeapi-container
+    docker rm pokeapi-container
+```
+
+
 ### Proceso de hacer el release de la aplicación
 
 ___Observación___ Para poder realizar este proceso es necesario contar previamente con azure cli instalado.
