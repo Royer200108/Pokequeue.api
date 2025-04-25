@@ -25,7 +25,7 @@ async def root():
 #Endpoint para obtener la version de la API
 @app.get("/version")
 async def version():
-    return {"version": "0.5.0"}
+    return {"version": "0.5.1"}
 
 #Endpoint para agregar nuevas peticiones
 @app.post("/api/request")

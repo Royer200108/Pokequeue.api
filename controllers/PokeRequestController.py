@@ -7,6 +7,8 @@ from utils.database import execute_query_json
 from utils.AQueue import AQueue
 from utils.ABlob import ABlob
 
+from utils.PokeAPIController import PokeAPIController
+
 #Configuracion del logging
 logging.basicConfig(level=logging.INFO) #genera logs a nivel de info
 logger = logging.getLogger(__name__) #logger para la clase
@@ -47,6 +49,11 @@ async def insert_pokemon_request( pokemon_request: PokeRequest ) -> dict: #Esto 
     #No necesia mas validacion (Ya se hace con el parametro ge en el model)
     try:
         query = " exec Pokequeue.create_pokerequest ?, ?" #Al ejecutarse el este query, el ? se reemplaza por el valor de params
+        
+        real_sample_size = PokeAPIController.get_pokemon_by_type(pokemon_request.pokemon_type) #Se obtiene el tamaño real de la muestra
+        if pokemon_request.sample_size > real_sample_size: #Si el tamaño de la muestra es mayor al tamaño real, se asigna el tamaño real
+            pokemon_request.sample_size = real_sample_size
+        
         params = (pokemon_request.pokemon_type, pokemon_request.sample_size)       #Estos son los parametros enviados al query (En este caso solo el tipo de pokemon)
         result = await execute_query_json(query, params, needs_commit=True) #Se ejecuta el query y al ser un procedimiento almacenado, se indica que debe haber un commit despues de ejecutarlo
         result_dict = json.loads(result) #Se convierte el resultado a un diccionario
